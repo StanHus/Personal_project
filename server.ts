@@ -45,7 +45,7 @@ app.post("/list", async (req, res) => {
 app.get("/list", async (req, res) => {
   console.log("trying")
   try {
-    const list = await client.query('SELECT * FROM plan ORDER BY session_id');
+    const list = await client.query('SELECT * FROM plan ORDER BY id');
     res.json(list.rows);
     console.log("success")
   } catch (err) {
@@ -59,7 +59,7 @@ app.get("/list", async (req, res) => {
 app.get("/list/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const session = await client.query("SELECT * FROM plan WHERE session_id = $1", [
+    const session = await client.query("SELECT * FROM plan WHERE id = $1", [
       id
     ]);
 
@@ -76,7 +76,7 @@ app.put("/list/:id", async (req, res) => {
     const { id } = req.params;
     const { muscles_trained } = req.body;
     const updateSession = await client.query(
-      "UPDATE plan SET muscles_trained = $1 WHERE session_id = $2",
+      "UPDATE plan SET muscles_trained = $1 WHERE id = $2",
       [muscles_trained, id]
     );
     res.json("Muscles_trained category was updated!");
@@ -90,7 +90,7 @@ app.put("/list/:id", async (req, res) => {
 app.delete("/list/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const deleteSession = await client.query("DELETE FROM plan WHERE session_id = $1", [
+    const deleteSession = await client.query("DELETE FROM plan WHERE id = $1", [
       id
     ]);
     res.json("Session was deleted!");
