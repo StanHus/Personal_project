@@ -26,13 +26,79 @@ app.use(cors()) //add CORS support to each following route handler
 const client = new Client(dbConfig);
 client.connect();
 
-app.get("/", async (req, res) => {
-  const dbres = await client.query('select * from categories');
-  res.json(dbres.rows);
+app.post("/list", async (req, res) => {
+  try {
+    const { muscles_trained } = req.body;
+    const list = await client.query(
+      "INSERT INTO plan (muscles_trained) VALUES($1) RETURNING *",
+      [muscles_trained]
+    );
+    console.log("success")
+    res.json(list.rows[0]);
+  } catch (err) {
+    res.status(500).send(err)
+  }
 });
 
+//get the list
 
-//Start the server on the given port
+app.get("/list", async (req, res) => {
+  console.log("trying")
+  try {
+    const list = await client.query('SELECT * FROM plan ORDER BY session_id');
+    res.json(list.rows);
+    console.log("success")
+  } catch (err) {
+    console.error(err)
+    res.status(500).send(err)
+  }
+});
+
+//get the session by id
+
+app.get("/list/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const session = await client.query("SELECT * FROM plan WHERE session_id = $1", [
+      id
+    ]);
+
+    res.json(session.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+//update muscles_trained ONLY session
+
+app.put("/list/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { muscles_trained } = req.body;
+    const updateSession = await client.query(
+      "UPDATE plan SET muscles_trained = $1 WHERE session_id = $2",
+      [muscles_trained, id]
+    );
+    res.json("Muscles_trained category was updated!");
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+//delete a session
+
+app.delete("/list/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleteSession = await client.query("DELETE FROM plan WHERE session_id = $1", [
+      id
+    ]);
+    res.json("Session was deleted!");
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
 const port = process.env.PORT;
 if (!port) {
   throw 'Missing PORT environment variable.  Set it in .env file.';
