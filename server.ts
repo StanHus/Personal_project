@@ -54,19 +54,19 @@ app.get("/list", async (req, res) => {
   }
 });
 
-//get the session by id
+// //get the session by id
 
-app.get("/list/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const session = await client.query("SELECT * FROM plan WHERE id = $1", [
-      id
-    ]);
-    res.redirect(`https://mysterious-reaches-13528.herokuapp.com/${id}`)
-  } catch (err) {
-    console.error(err.message);
-  }
-});
+// app.get("/list/:id", async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const session = await client.query("SELECT * FROM plan WHERE id = $1", [
+//       id
+//     ]);
+//     res.redirect(`https://mysterious-reaches-13528.herokuapp.com/${id}`)
+//   } catch (err) {
+//     console.error(err.message);
+//   }
+// });
 
 //open the session page
 
