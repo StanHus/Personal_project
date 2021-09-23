@@ -62,8 +62,8 @@ app.get("/list/:id", async (req, res) => {
     const session = await client.query("SELECT * FROM plan WHERE id = $1", [
       id
     ]);
-
     res.json(session.rows[0]);
+    res.redirect(`https://mysterious-reaches-13528.herokuapp.com/${id}`)
   } catch (err) {
     console.error(err.message);
   }
