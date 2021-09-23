@@ -54,20 +54,6 @@ app.get("/list", async (req, res) => {
   }
 });
 
-// //get the session by id
-
-// app.get("/list/:id", async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const session = await client.query("SELECT * FROM plan WHERE id = $1", [
-//       id
-//     ]);
-//     res.redirect(`https://mysterious-reaches-13528.herokuapp.com/${id}`)
-//   } catch (err) {
-//     console.error(err.message);
-//   }
-// });
-
 //open the session page
 
 app.get("/:id", async (req, res) => {
@@ -84,7 +70,7 @@ app.get("/:id", async (req, res) => {
 
 //update muscles_trained ONLY session
 
-app.put("/list/:id", async (req, res) => {
+app.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { muscles_trained } = req.body;
@@ -100,7 +86,7 @@ app.put("/list/:id", async (req, res) => {
 
 //delete a session
 
-app.delete("/list/:id", async (req, res) => {
+app.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const deleteSession = await client.query("DELETE FROM plan WHERE id = $1", [
