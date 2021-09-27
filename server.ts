@@ -1,4 +1,4 @@
-import { Client } from "pg";
+import { Pool } from "pg";
 import { config } from "dotenv";
 import express from "express";
 import cors from "cors";
@@ -12,26 +12,18 @@ const dbConfig = {
   ssl: sslSetting,
 };
 
-// const client = new Client({
-//   user: "postgres",
-//   password: "password",
-//   host: "localhost",
-//   port: 5432,
-//   database: "workout"
-// })
-
 const app = express();
 
 app.use(express.json()); //add body parser to each following route handler
 app.use(cors()) //add CORS support to each following route handler
 
-const client = new Client(dbConfig);
-client.connect();
+const pool = new Pool(dbConfig);
+pool.connect();
 
 app.post("/list", async (req, res) => {
   try {
     const { muscles_trained } = req.body;
-    const list = await client.query(
+    const list = await pool.query(
       "INSERT INTO plan (muscles_trained) VALUES($1) RETURNING *",
       [muscles_trained]
     );
@@ -47,7 +39,7 @@ app.post("/list", async (req, res) => {
 app.get("/list", async (req, res) => {
   console.log("trying")
   try {
-    const list = await client.query('SELECT * FROM plan ORDER BY id');
+    const list = await pool.query('SELECT * FROM plan ORDER BY id');
     res.json(list.rows);
     console.log("success")
   } catch (err) {
@@ -61,7 +53,7 @@ app.get("/list", async (req, res) => {
 app.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const session = await client.query("SELECT * FROM plan WHERE id = $1", [
+    const session = await pool.query("SELECT * FROM plan WHERE id = $1", [
       id
     ]);
     res.json(session.rows[0])
@@ -76,7 +68,7 @@ app.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { muscles_trained } = req.body;
-    const updateSession = await client.query(
+    const updateSession = await pool.query(
       "UPDATE plan SET muscles_trained = $1 WHERE id = $2",
       [muscles_trained, id]
     );
@@ -91,7 +83,7 @@ app.put("/:id", async (req, res) => {
 app.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const deleteSession = await client.query("DELETE FROM plan WHERE id = $1", [
+    const deleteSession = await pool.query("DELETE FROM plan WHERE id = $1", [
       id
     ]);
     res.json("Session was deleted!");
@@ -104,7 +96,7 @@ app.delete("/:id", async (req, res) => {
 
 app.get("/list/suggest", async (req, res) => {
   try {
-    const session = await client.query("SELECT muscles_trained FROM plan GROUP BY muscles_trained ORDER BY COUNT(muscles_trained), MIN(id) LIMIT 1");
+    const session = await pool.query("SELECT muscles_trained FROM plan GROUP BY muscles_trained ORDER BY COUNT(muscles_trained), MIN(id) LIMIT 1");
     res.json(session.rows[0])
   } catch (err) {
     console.error(err.message);
