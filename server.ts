@@ -3,20 +3,22 @@ import { config } from "dotenv";
 import express from "express";
 import cors from "cors";
 
-config(); //Read .env file lines as though they were env vars.
+config();
 
-//Call this script with the environment variable LOCAL set if you want to connect to a local db (i.e. without SSL)
-//Do not set the environment variable LOCAL if you want to connect to a heroku DB.
-
-//For the ssl property of the DB connection config, use a value of...
-// false - when connecting to a local DB
-// { rejectUnauthorized: false } - when connecting to a heroku DB
 const herokuSSLSetting = { rejectUnauthorized: false }
 const sslSetting = process.env.LOCAL ? false : herokuSSLSetting
 const dbConfig = {
   connectionString: process.env.DATABASE_URL,
   ssl: sslSetting,
 };
+
+// const client = new Client({
+//   user: "postgres",
+//   password: "password",
+//   host: "localhost",
+//   port: 5432,
+//   database: "workout"
+// })
 
 const app = express();
 
@@ -100,7 +102,7 @@ app.delete("/:id", async (req, res) => {
 
 //make a suggestion
 
-app.get("/suggest", async (req, res) => {
+app.get("/list/suggest", async (req, res) => {
   try {
     const session = await client.query("SELECT muscles_trained FROM plan GROUP BY muscles_trained ORDER BY COUNT(muscles_trained), MIN(id) LIMIT 1");
     res.json(session.rows[0])
