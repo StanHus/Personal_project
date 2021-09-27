@@ -102,7 +102,7 @@ app.delete("/:id", async (req, res) => {
 
 app.get("/suggest", async (req, res) => {
   try {
-    const session = await client.query("SELECT muscles_trained FROM plan GROUP BY muscles_trained ORDER BY COUNT(muscles_trained), MIN(id) LIMIT 1;");
+    const session = await client.query("SELECT muscles_trained FROM plan GROUP BY muscles_trained ORDER BY COUNT(muscles_trained), MIN(id) LIMIT 1");
     res.json(session.rows[0])
   } catch (err) {
     console.error(err.message);
