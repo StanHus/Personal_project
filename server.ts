@@ -101,7 +101,7 @@ app.delete("/:id", async (req, res) => {
 
 app.get("/list/suggest", async (req, res) => {
   try {
-    const session = await pool.query("SELECT CASE WHEN (SELECT COUNT(*) AS num FROM plan GROUP BY muscles_trained ORDER BY num desc LIMIT 1) <= (SELECT COUNT(*)/3 FROM plan) THEN 'Rest Day' ELSE (SELECT muscles_trained FROM plan GROUP BY muscles_trained ORDER BY COUNT(muscles_trained), MIN(id) LIMIT 1) END AS answer FROM plan LIMIT 1");
+    const session = await pool.query("SELECT CASE WHEN (SELECT COUNT(*) AS num FROM plan GROUP BY muscles_trained ORDER BY num desc LIMIT 1) <= (SELECT COUNT(*)/3 FROM plan) THEN 'Rest' ELSE (SELECT muscles_trained FROM plan GROUP BY muscles_trained ORDER BY COUNT(muscles_trained), MIN(id) LIMIT 1) END AS answer FROM plan LIMIT 1");
     res.json(session.rows[0])
   } catch (err) {
     console.error(err.message);
