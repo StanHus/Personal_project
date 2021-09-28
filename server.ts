@@ -97,28 +97,16 @@ app.delete("/:id", async (req, res) => {
   }
 });
 
-//make a suggestion
+//make a SMART suggestion (including resting every once in a while)
 
 app.get("/list/suggest", async (req, res) => {
   try {
-    const session = await pool.query("SELECT muscles_trained FROM plan GROUP BY muscles_trained ORDER BY COUNT(muscles_trained), MIN(id) LIMIT 1");
+    const session = await pool.query("SELECT CASE WHEN (SELECT COUNT(*) AS num FROM plan GROUP BY muscles_trained ORDER BY num desc LIMIT 1) <= (SELECT COUNT(*)/3 FROM plan) THEN 'Rest Day' ELSE (SELECT muscles_trained FROM plan GROUP BY muscles_trained ORDER BY COUNT(muscles_trained), MIN(id) LIMIT 1) END AS answer FROM plan LIMIT 1");
     res.json(session.rows[0])
   } catch (err) {
     console.error(err.message);
   }
 });
-
-//do the math for the rest day
-
-// app.get("/list/rest", async (req, res) => {
-//   try {
-//     const data = await pool.query("select count(*) from plan where muscles_trained = 'Rest Day'");
-//     const ratio = res.json(data.rows[0])
-
-//   } catch (err) {
-//     console.error(err.message);
-//   }
-// });
 
 const port = process.env.PORT;
 if (!port) {
