@@ -2,6 +2,7 @@ import { Pool } from "pg";
 import { config } from "dotenv";
 import express from "express";
 import cors from "cors";
+import {DeleteThis, UpdateThis} from "./functions"
 
 config();
 
@@ -18,6 +19,7 @@ app.use(express.json()); //add body parser to each following route handler
 app.use(cors()) //add CORS support to each following route handler
 
 const pool = new Pool(dbConfig);
+export {pool}
 pool.connect();
 
 app.post("/list", async (req, res) => {
@@ -62,33 +64,36 @@ app.get("/:id", async (req, res) => {
   }
 });
 
-//update muscles_trained ONLY session
+//update muscles_trained ONLY session (new version)
 
 app.put("/:id", async (req, res) => {
-  try {
+
     const { id } = req.params;
     const { muscles_trained } = req.body;
-    const updateSession = await pool.query(
-      "UPDATE plan SET muscles_trained = $1 WHERE id = $2",
-      [muscles_trained, id]
-    );
-    res.json("Muscles_trained category was updated!");
-  } catch (err) {
-    console.error(err.message);
-  }
+    const updateSession = UpdateThis(muscles_trained, id)
+
+    if (updateSession){
+      res.json("Muscles_trained category was updated!");
+    }
+    else {
+      console.error("problem in updating")
+    }
 });
 
-//delete a session
+//delete a session (new version)
 
 app.delete("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const deleteSession = await pool.query("DELETE FROM plan WHERE id = $1", [
-      id
-    ]);
-    res.json("Session was deleted!");
-  } catch (err) {
-    console.log(err.message);
+
+  const { id } = req.params;
+  const deleteSession = DeleteThis(id)
+  
+  if (deleteSession){
+  res.json("Session was deleted!");
+  res.status(200)
+}
+  else{
+    console.error("problem in deleting")
+    res.status(400)
   }
 });
 
@@ -103,6 +108,18 @@ app.get("/list/suggest", async (req, res) => {
   }
 });
 
+//do the math for the rest day
+
+// app.get("/list/rest", async (req, res) => {
+//   try {
+//     const data = await pool.query("select count(*) from plan where muscles_trained = 'Rest Day'");
+//     const ratio = res.json(data.rows[0])
+
+//   } catch (err) {
+//     console.error(err.message);
+//   }
+// });
+
 const port = process.env.PORT;
 if (!port) {
   throw 'Missing PORT environment variable.  Set it in .env file.';
@@ -110,3 +127,5 @@ if (!port) {
 app.listen(port, () => {
   console.log(`Server is up and running on port ${port}`);
 });
+
+export default app;
