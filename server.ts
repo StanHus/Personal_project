@@ -6,19 +6,27 @@ import {DeleteThis, UpdateThis} from "./functions"
 
 config();
 
-const herokuSSLSetting = { rejectUnauthorized: false }
-const sslSetting = process.env.LOCAL ? false : herokuSSLSetting
-const dbConfig = {
-  connectionString: process.env.DATABASE_URL,
-  ssl: sslSetting,
-};
+// const herokuSSLSetting = { rejectUnauthorized: false }
+// const sslSetting = process.env.LOCAL ? false : herokuSSLSetting
+// const dbConfig = {
+//   connectionString: process.env.DATABASE_URL,
+//   ssl: sslSetting,
+// };
+
+const pool = new Pool({
+  user: "postgres",
+  password: "password",
+  host: "localhost",
+  port: 5432,
+  database: "workout"
+})
 
 const app = express();
 
 app.use(express.json()); //add body parser to each following route handler
 app.use(cors()) //add CORS support to each following route handler
 
-const pool = new Pool(dbConfig);
+// const pool = new Pool(dbConfig);
 export {pool}
 pool.connect();
 
@@ -52,7 +60,7 @@ app.get("/list", async (req, res) => {
 
 //open the session page
 
-app.get("/:id", async (req, res) => {
+app.get("/list/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const session = await pool.query("SELECT * FROM plan WHERE id = $1", [
@@ -103,10 +111,58 @@ app.get("/list/suggest", async (req, res) => {
   try {
     const session = await pool.query("SELECT CASE WHEN (SELECT COUNT(*) AS num FROM plan GROUP BY muscles_trained ORDER BY num desc LIMIT 1) <= (SELECT COUNT(*)/3 FROM plan) THEN 'Rest' ELSE (SELECT muscles_trained FROM plan GROUP BY muscles_trained ORDER BY COUNT(muscles_trained), MIN(id) LIMIT 1) END AS answer FROM plan LIMIT 1");
     res.json(session.rows[0])
+    console.log(session.rows[0])
   } catch (err) {
     console.error(err.message);
   }
 });
+
+//open the progression page
+
+app.get("/progress", async (req, res) => {
+  try {
+    const progress = await pool.query("select * from tracking");
+    res.json(progress.rows)
+    console.log(progress.rows)
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+//post an exercise
+
+app.post("/progress", async (req, res) => {
+  try {
+    const { muscles_group, exercise_name, sets, reps, weight } = req.body;
+    const list = await pool.query(
+      "INSERT INTO tracking (muscle_group, exercise_name, sets, reps, weight) VALUES ($1, $2, $3, $4, $5) Returning *",
+      [muscles_group, exercise_name, sets, reps, weight]
+    );
+    console.log("success")
+    res.json(list.rows[0]);
+  } catch (err) {
+    res.status(500).send(err)
+  }
+});
+
+//delete an exercise 
+
+app.delete("/progress/:id", async (req, res) => {
+
+  const { id } = req.params;
+  const deleteSession = await pool.query("DELETE FROM tracking WHERE ex_id = $1", [
+    id]);
+  
+  if (deleteSession){
+  res.json("Session was deleted!");
+  res.status(200)
+}
+  else{
+    console.error("problem in deleting")
+    res.status(400)
+  }
+});
+
 
 const port = process.env.PORT;
 if (!port) {
