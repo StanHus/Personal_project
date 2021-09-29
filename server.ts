@@ -6,27 +6,27 @@ import {DeleteThis, UpdateThis} from "./functions"
 
 config();
 
-// const herokuSSLSetting = { rejectUnauthorized: false }
-// const sslSetting = process.env.LOCAL ? false : herokuSSLSetting
-// const dbConfig = {
-//   connectionString: process.env.DATABASE_URL,
-//   ssl: sslSetting,
-// };
+const herokuSSLSetting = { rejectUnauthorized: false }
+const sslSetting = process.env.LOCAL ? false : herokuSSLSetting
+const dbConfig = {
+  connectionString: process.env.DATABASE_URL,
+  ssl: sslSetting,
+};
 
-const pool = new Pool({
-  user: "postgres",
-  password: "password",
-  host: "localhost",
-  port: 5432,
-  database: "workout"
-})
+// const pool = new Pool({
+//   user: "postgres",
+//   password: "password",
+//   host: "localhost",
+//   port: 5432,
+//   database: "workout"
+// })
 
 const app = express();
 
 app.use(express.json()); //add body parser to each following route handler
 app.use(cors()) //add CORS support to each following route handler
 
-// const pool = new Pool(dbConfig);
+const pool = new Pool(dbConfig);
 export {pool}
 pool.connect();
 
@@ -121,7 +121,7 @@ app.get("/list/suggest", async (req, res) => {
 
 app.get("/progress", async (req, res) => {
   try {
-    const progress = await pool.query("select * from tracking");
+    const progress = await pool.query("select * from tracking ORDER BY date desc");
     res.json(progress.rows)
     console.log(progress.rows)
   } catch (err) {
@@ -133,10 +133,10 @@ app.get("/progress", async (req, res) => {
 
 app.post("/progress", async (req, res) => {
   try {
-    const { muscles_group, exercise_name, sets, reps, weight } = req.body;
+    const { date, muscle_group, exercise_name, sets, reps, weight } = req.body;
     const list = await pool.query(
-      "INSERT INTO tracking (muscle_group, exercise_name, sets, reps, weight) VALUES ($1, $2, $3, $4, $5) Returning *",
-      [muscles_group, exercise_name, sets, reps, weight]
+      "INSERT INTO tracking (date, muscle_group, exercise_name, sets, reps, weight) VALUES ($1, $2, $3, $4, $5, $6) Returning *",
+      [date, muscle_group, exercise_name, sets, reps, weight]
     );
     console.log("success")
     res.json(list.rows[0]);
