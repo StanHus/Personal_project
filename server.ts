@@ -117,6 +117,10 @@ app.get("/list/suggest", async (req, res) => {
   }
 });
 
+//get the progress page
+app.get("/progressPage", async (req, res) => {
+  res.redirect("/progressPage")
+})
 //open the progression page
 
 app.get("/progress", async (req, res) => {
