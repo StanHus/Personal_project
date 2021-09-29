@@ -119,7 +119,7 @@ app.get("/list/suggest", async (req, res) => {
 
 //get the progress page
 app.get("/progressPage", async (req, res) => {
-  res.redirect("/progressPage")
+  res.redirect("/progress")
 })
 //open the progression page
 
