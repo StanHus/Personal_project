@@ -117,55 +117,56 @@ app.get("/suggest", async (req, res) => {
   }
 });
 
-// //get the progress page
-// app.get("/progressPage", async (req, res) => {
-//   res.redirect("/progress")
-// })
-// //open the progression page
+//get the progress page
+app.get("/progressPage", async (req, res) => {
+  res.redirect("/progress")
+})
 
-// app.get("/progress", async (req, res) => {
-//   try {
-//     const progress = await pool.query("select * from tracking ORDER BY date desc");
-//     res.json(progress.rows)
-//     console.log(progress.rows)
-//   } catch (err) {
-//     console.error(err.message);
-//   }
-// });
+//open the progression page
 
-//post an exercise
+app.get("/progress", async (req, res) => {
+  try {
+    const progress = await pool.query("select * from tracking ORDER BY date desc");
+    res.json(progress.rows)
+    console.log(progress.rows)
+  } catch (err) {
+    console.error(err.message);
+  }
+});
 
-// app.post("/progress", async (req, res) => {
-//   try {
-//     const { date, muscle_group, exercise_name, sets, reps, weight } = req.body;
-//     const list = await pool.query(
-//       "INSERT INTO tracking (date, muscle_group, exercise_name, sets, reps, weight) VALUES ($1, $2, $3, $4, $5, $6) Returning *",
-//       [date, muscle_group, exercise_name, sets, reps, weight]
-//     );
-//     console.log("success")
-//     res.json(list.rows[0]);
-//   } catch (err) {
-//     res.status(500).send(err)
-//   }
-// });
+// post an exercise
 
-// //delete an exercise 
+app.post("/progress", async (req, res) => {
+  try {
+    const { date, muscle_group, exercise_name, sets, reps, weight } = req.body;
+    const list = await pool.query(
+      "INSERT INTO tracking (date, muscle_group, exercise_name, sets, reps, weight) VALUES ($1, $2, $3, $4, $5, $6) Returning *",
+      [date, muscle_group, exercise_name, sets, reps, weight]
+    );
+    console.log("success")
+    res.json(list.rows[0]);
+  } catch (err) {
+    res.status(500).send(err)
+  }
+});
 
-// app.delete("/progress/:id", async (req, res) => {
+//delete an exercise 
 
-//   const { id } = req.params;
-//   const deleteSession = await pool.query("DELETE FROM tracking WHERE ex_id = $1", [
-//     id]);
+app.delete("/progress/:id", async (req, res) => {
+
+  const { id } = req.params;
+  const deleteSession = await pool.query("DELETE FROM tracking WHERE ex_id = $1", [
+    id]);
   
-//   if (deleteSession){
-//   res.json("Session was deleted!");
-//   res.status(200)
-// }
-//   else{
-//     console.error("problem in deleting")
-//     res.status(400)
-//   }
-// });
+  if (deleteSession){
+  res.json("Session was deleted!");
+  res.status(200)
+}
+  else{
+    console.error("problem in deleting")
+    res.status(400)
+  }
+});
 
 
 const port = process.env.PORT;
