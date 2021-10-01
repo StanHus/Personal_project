@@ -155,7 +155,7 @@ app.post("/progress", async (req, res) => {
 app.delete("/progress/:id", async (req, res) => {
 
   const { id } = req.params;
-  const deleteSession = await pool.query("DELETE FROM tracking WHERE ex_id = $1", [
+  const deleteSession = await pool.query("DELETE FROM tracking WHERE session_id = $1", [
     id]);
   
   if (deleteSession){
