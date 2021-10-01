@@ -126,7 +126,7 @@ app.get("/progressPage", async (req, res) => {
 
 app.get("/progress", async (req, res) => {
   try {
-    const progress = await pool.query("select * from tracking ORDER BY date desc");
+    const progress = await pool.query("select * from tracking ORDER BY date desc LIMIT 15");
     res.json(progress.rows)
     console.log(progress.rows)
   } catch (err) {
