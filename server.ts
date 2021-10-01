@@ -153,7 +153,6 @@ app.post("/progress", async (req, res) => {
 //delete an exercise 
 
 app.delete("/progress/:id", async (req, res) => {
-
   const { id } = req.params;
   const deleteSession = await pool.query("DELETE FROM tracking WHERE session_id = $1", [
     id]);
@@ -168,6 +167,17 @@ app.delete("/progress/:id", async (req, res) => {
   }
 });
 
+//get the progression by an exercise name
+
+app.get("/analysis/:id", async (req, res) => {
+  const { exercise } = req.params;
+  try {
+    const progression = await pool.query("SELECT exercise_name, sets * reps * weight AS total_weight FROM tracking WHERE exercise_name = $1 ORDER BY date", [exercise]);
+    res.json(progression.rows)
+  } catch (err) {
+    console.error(err.message);
+  }
+});
 
 const port = process.env.PORT;
 if (!port) {
