@@ -169,7 +169,7 @@ app.delete("/progress/:id", async (req, res) => {
 
 //get the progression by an exercise name
 
-app.get("/analysis", async (req, res) => {
+app.get("/analysis/:exercise", async (req, res) => {
   const { exercise } = req.params;
   try {
     const progression = await pool.query("SELECT session_id, exercise_name, sets * reps * weight AS total_weight FROM tracking WHERE exercise_name = $1 ORDER BY date", [exercise]);
