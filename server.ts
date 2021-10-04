@@ -179,9 +179,20 @@ app.get("/analysis/:exercise", async (req, res) => {
   }
 });
 
-app.get("/analysis/dips", async (req, res) => {
+function capitalise (str: string){
+  let ans = []
+  let arr = str.split('')
+  ans.push(arr[0].toUpperCase())
+  ans.push(arr.slice(1).join(''))
+  console.log(arr)
+  return ans.join('')
+}
+
+app.get("/analysis/:dips", async (req, res) => {
+  const { dips } = req.params;
+  const capital = capitalise(dips);
   try {
-    const progression = await pool.query("SELECT session_id, exercise_name, sets * reps * weight AS total_weight FROM tracking WHERE exercise_name = 'Dips' ORDER BY date");
+    const progression = await pool.query("SELECT session_id, exercise_name, sets * reps * weight AS total_weight FROM tracking WHERE exercise_name = $1 ORDER BY date", [capital]);
     res.json(progression.rows)
   } catch (err) {
     console.error(err.message);
