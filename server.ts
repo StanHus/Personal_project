@@ -171,7 +171,7 @@ app.delete("/progress/:id", async (req, res) => {
 
 app.get("/analysis", async (req, res) => {
   try {
-    const progress = await pool.query("SELECT session_id, exercise_name, sets * reps * weight AS total_weight FROM tracking ORDER BY date");
+    const progress = await pool.query("SELECT session_id, date, exercise_name, sets * reps * weight AS total_weight FROM tracking ORDER BY date");
     res.json(progress.rows)
     console.log(progress.rows)
   } catch (err) {
