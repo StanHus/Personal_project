@@ -179,6 +179,16 @@ app.get("/analysis", async (req, res) => {
   }
 });
 
+app.get("/options", async (req, res) => {
+  try {
+    const progress = await pool.query("SELECT exercise_name from tracking group by exercise_name");
+    res.json(progress.rows)
+    console.log(progress.rows)
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
 
 app.get("/analysis/:exercise", async (req, res) => {
   const { exercise_name } = req.params;
