@@ -169,6 +169,16 @@ app.delete("/progress/:id", async (req, res) => {
 
 //get the progression by an exercise name
 
+app.get("/exercises", async (req, res) => {
+  try {
+    const progress = await pool.query("SELECT date, exercise_name, SUM(sets*reps*weight) AS total_weight FROM tracking GROUP BY exercise_name, date ORDER BY date");
+    res.json(progress.rows)
+    console.log(progress.rows)
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
 app.get("/analysis", async (req, res) => {
   try {
     const progress = await pool.query("SELECT exercise_name, SUM(sets*reps*weight) AS total_weight, COUNT(*) as days_trained, SUM(sets*reps*weight)/count(*) as average_weight FROM tracking GROUP BY exercise_name");
