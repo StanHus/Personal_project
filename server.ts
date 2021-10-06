@@ -171,8 +171,8 @@ app.delete("/progress/:id", async (req, res) => {
 
 app.get("/analysis", async (req, res) => {
   try {
-    const progress = await pool.query("SELECT date, exercise_name, SUM(sets*reps*weight) AS total_weight FROM tracking GROUP BY exercise_name, date ORDER BY date");
-    res.json(progress.rows)
+    const progress = await pool.query("SELECT exercise_name, SUM(sets*reps*weight) AS total_weight, COUNT(*) as days_trained, SUM(sets*reps*weight)/count(*) as average_weight FROM tracking GROUP BY exercise_name");
+    res.json(progress.rows) //exercise_name, total_weight, days_trained, average_weight
     console.log(progress.rows)
   } catch (err) {
     console.error(err.message);
@@ -181,7 +181,7 @@ app.get("/analysis", async (req, res) => {
 
 app.get("/options", async (req, res) => {
   try {
-    const progress = await pool.query("SELECT exercise_name from tracking group by exercise_name");
+    const progress = await pool.query("SELECT exercise_name from tracking group by exercise_name order by exercise_name");
     res.json(progress.rows)
     console.log(progress.rows)
   } catch (err) {
