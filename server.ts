@@ -181,8 +181,8 @@ app.get("/exercises", async (req, res) => {
 
 app.get("/analysis", async (req, res) => {
   try {
-    const progress = await pool.query("SELECT exercise_name, SUM(sets*reps*weight) AS total_weight, COUNT(*) as days_trained, SUM(sets*reps*weight)/count(*) as average_weight FROM tracking GROUP BY exercise_name");
-    res.json(progress.rows) //exercise_name, total_weight, days_trained, average_weight
+    const progress = await pool.query("SELECT exercise_name, SUM(sets*reps*weight) AS total_weight, COUNT(*) as days_trained, SUM(sets*reps*weight)/count(*) as average_weight, sum(sets)/count(*) as average_sets, sum(reps)/count(*) as average_reps, sum(weight)/count(*) as average_total_weight FROM tracking GROUP BY exercise_name");
+    res.json(progress.rows) //exercise_name, total_weight, days_trained, average_total_weight, average_weight, average_sets, average_reps
     console.log(progress.rows)
   } catch (err) {
     console.error(err.message);
