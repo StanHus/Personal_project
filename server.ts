@@ -230,6 +230,34 @@ app.get("/analysis/:dips", async (req, res) => {
   }
 });
 
+//
+//
+//
+//
+//
+//users section
+//
+//
+//
+//
+//
+
+//sign up
+
+app.post("/users", async (req, res) => {
+  try {
+    const { userName, email, password } = req.body;
+    const list = await pool.query(
+      "INSERT INTO users (email, password, username) VALUES ($1, $2, $3) Returning *",
+      [email, password, userName]
+    );
+    console.log("success")
+    res.json(list.rows[0]);
+  } catch (err) {
+    res.status(500).send(err)
+  }
+});
+
 const port = process.env.PORT;
 if (!port) {
   throw 'Missing PORT environment variable.  Set it in .env file.';
