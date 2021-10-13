@@ -27,8 +27,9 @@ app.use(express.json()); //add body parser to each following route handler
 app.use(cors()) //add CORS support to each following route handler
 
 const pool = new Pool(dbConfig);
-export {pool}
 pool.connect();
+
+export {pool}
 
 app.post("/list", async (req, res) => {
   try {
@@ -122,11 +123,23 @@ app.get("/progressPage", async (req, res) => {
   res.redirect("/progress")
 })
 
-//open the progression page
+//open the progression page (15 limit)
 
 app.get("/progress", async (req, res) => {
   try {
     const progress = await pool.query("select * from tracking ORDER BY date desc LIMIT 15");
+    res.json(progress.rows)
+    console.log(progress.rows)
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+//open progression (full)
+
+app.get("/progressFull", async (req, res) => {
+  try {
+    const progress = await pool.query("select * from tracking ORDER BY date desc");
     res.json(progress.rows)
     console.log(progress.rows)
   } catch (err) {
@@ -247,12 +260,12 @@ app.get("/analysis/:dips", async (req, res) => {
 app.post("/users", async (req, res) => {
   try {
     const { userName, email, password } = req.body;
-    const list = await pool.query(
+    const users = await pool.query(
       "INSERT INTO users (email, password, username) VALUES ($1, $2, $3) Returning *",
       [email, password, userName]
     );
     console.log("success")
-    res.json(list.rows[0]);
+    res.json(users.rows[0]);
   } catch (err) {
     res.status(500).send(err)
   }
