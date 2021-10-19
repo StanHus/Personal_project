@@ -271,7 +271,7 @@ app.post("/users", async (req, res) => {
   }
 });
 
-app.get("/username", async (req, res) => {
+app.get("/users/:username", async (req, res) => {
   const { username } = req.params;
   try {
     const progression = await pool.query("SELECT username, email, password FROM users WHERE username = $1", [username]);
