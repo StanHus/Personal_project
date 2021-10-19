@@ -271,6 +271,16 @@ app.post("/users", async (req, res) => {
   }
 });
 
+app.get("/username", async (req, res) => {
+  const { username } = req.params;
+  try {
+    const progression = await pool.query("SELECT username, email, password FROM users WHERE username = $1", [username]);
+    res.json(progression.rows[0])
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
 const port = process.env.PORT;
 if (!port) {
   throw 'Missing PORT environment variable.  Set it in .env file.';
