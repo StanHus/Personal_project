@@ -151,10 +151,10 @@ app.get("/progressFull", async (req, res) => {
 
 app.post("/progress", async (req, res) => {
   try {
-    const { date, muscle_group, exercise_name, sets, reps, weight } = req.body;
+    const { date, muscle_group, exercise_name, sets, reps, weight, user_email } = req.body;
     const list = await pool.query(
-      "INSERT INTO tracking (date, muscle_group, exercise_name, sets, reps, weight) VALUES ($1, $2, $3, $4, $5, $6) Returning *",
-      [date, muscle_group, exercise_name, sets, reps, weight]
+      "INSERT INTO tracking (date, muscle_group, exercise_name, sets, reps, weight, user_email) VALUES ($1, $2, $3, $4, $5, $6, $7) Returning *",
+      [date, muscle_group, exercise_name, sets, reps, weight, user_email]
     );
     console.log("success")
     res.json(list.rows[0]);
