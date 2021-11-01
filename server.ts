@@ -215,10 +215,22 @@ app.get("/analysis", async (req, res) => {
   }
 });
 
-app.get("/options", async (req, res) => {
+app.get("/exerciseOptions", async (req, res) => {
   try {
     const progress = await pool.query(
       "SELECT user_email, exercise_name from tracking group by exercise_name, user_email order by exercise_name"
+    );
+    res.json(progress.rows);
+    console.log(progress.rows);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+app.get("/muscleOptions", async (req, res) => {
+  try {
+    const progress = await pool.query(
+      "SELECT user_email, muscle_group from tracking group by muscle_group, user_email order by muscle_group"
     );
     res.json(progress.rows);
     console.log(progress.rows);
