@@ -301,9 +301,6 @@ app.post("/beauty", async (req, res) => {
         [task]
       );
     }
-
-    res.header("Access-Control-Allow-Origin", "*")
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-type, Accept")
     res.status(200).send("Completed")
 
   }
