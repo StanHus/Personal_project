@@ -275,6 +275,54 @@ app.get("/analysis/:dips", async (req, res) => {
   }
 });
 
+
+app.post("/beauty", async (req, res) => {
+  let { task, number } = req.body;
+  number = Number(number)
+
+    if(number === 1) {
+      const list = await pool.query(
+        "INSERT INTO tasks (task, done) VALUES($1, false)",
+        [task]
+      );
+    } else if (number === 2){
+      const list = await pool.query(
+        "INSERT INTO tasks (task, done) VALUES($1, false); INSERT INTO tasks (task, done) VALUES($1, false);",
+        [task]
+      );
+    } else if (number === 3){
+      const list = await pool.query(
+        "INSERT INTO tasks (task, done) VALUES($1, false); INSERT INTO tasks (task, done) VALUES($1, false); INSERT INTO tasks (task, done) VALUES($1, false);",
+        [task]
+      );
+    } else if (number === 4){
+      const list = await pool.query(
+        "INSERT INTO tasks (task, done) VALUES($1, false); INSERT INTO tasks (task, done) VALUES($1, false); INSERT INTO tasks (task, done) VALUES($1, false); INSERT INTO tasks (task, done) VALUES($1, false);",
+        [task]
+      );
+    }
+
+    res.header("Access-Control-Allow-Origin", "*")
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-type, Accept")
+    res.status(200).send("Completed")
+
+  }
+);
+
+//get the list
+
+app.get("/beauty", async (req, res) => {
+  try {
+    const list = await pool.query("select * from tasks ORDER BY id");
+    res.json(list.rows);
+    console.log("success");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err);
+  }
+});
+
+
 const port = process.env.PORT;
 if (!port) {
   throw "Missing PORT environment variable.  Set it in .env file.";
